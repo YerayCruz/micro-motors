@@ -53,7 +53,7 @@ def generate_lattice(a, nx, ny, nz, circle_radius):
     return np.array(positions)
 
 
-def apply_ratchet_boundary(positions, radius, saw_amp, saw_freq, N):
+def apply_ratchet_boundary(positions, radius, saw_amp, saw_freq, N, specular):
     """
     Filter lattice points to retain only those within a ratchet-like boundary.
     
@@ -76,8 +76,15 @@ def apply_ratchet_boundary(positions, radius, saw_amp, saw_freq, N):
             angle += 2 * np.pi  # Normalize angle to [0, 2π]
         
         # Calculate the sawtooth-modulated radius
-        #sawtooth_mod = saw_amp * (1 - ((angle * N / (2 * np.pi)) % (N // saw_freq)) / (N // saw_freq)) ## with no specular rotation
-        sawtooth_mod = saw_amp * ((angle * N / (2 * np.pi)) % (N // saw_freq)) / (N // saw_freq) ## with specular rotation
+
+        if not specular:
+            
+            sawtooth_mod = saw_amp * (1 - ((angle * N / (2 * np.pi)) % (N // saw_freq)) / (N // saw_freq)) ## with no specular rotation
+
+        else:
+            
+            sawtooth_mod = saw_amp * ((angle * N / (2 * np.pi)) % (N // saw_freq)) / (N // saw_freq) ## with specular rotation
+            
         R_mod = radius + sawtooth_mod - (saw_amp / 2)  # Offset to center sawtooth
         
         # Check if the point is within the boundary
